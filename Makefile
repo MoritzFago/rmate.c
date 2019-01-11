@@ -2,20 +2,22 @@ PROGRAM = rmate
 
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
-RM?=rm -f
+RM ?= rm -f
 
-INCLUDES = 
-CFLAGS = -g -Wall -Wextra -Wno-missing-field-initializers $(INCLUDES)
-#LDFLAGS = -L.
-#LDLIBS +=
+CFLAGS += -O2 -Wall -Wextra -Wno-missing-field-initializers
+
+PREFIX = ~/bin
 
 .o : .c
-	echo "foo"
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
-$(PROGRAM): version.h $(OBJS)
+all: $(PROGRAM)
 
+$(PROGRAM): $(OBJS)
+	$(CC) $(CFLAGS) $< -o $@
+
+rmate.c: version.h
 
 version.h: version.sh
 	sh version.sh $(MSG_DEF) > $@
@@ -23,7 +25,8 @@ version.h: version.sh
 clean:
 	$(RM) $(PROGRAM) version.h *.o
 
-install: rmate
-	install rmate ~/bin/rmate
+install: $(PROGRAM)
+	install -d $(PREFIX)
+	install $(PROGRAM) $(PREFIX)/$(PROGRAM)
 
-.PHONY: release clean
+.PHONY: clean all
